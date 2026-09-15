@@ -1,0 +1,495 @@
+/* =====================================================
+   CYBERPUNK TRADER — TRADING JOURNAL
+   ===================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+
+/* ================================
+   GLOBAL
+   ================================ */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    font-family: "Rajdhani", Arial, sans-serif;
+
+    color: #eeeeff;
+
+    background:
+        radial-gradient(
+            circle at 15% 20%,
+            rgba(157, 0, 255, 0.14),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 85% 75%,
+            rgba(0, 255, 220, 0.08),
+            transparent 30%
+        ),
+        #08060d;
+
+    overflow-x: hidden;
+}
+
+
+/* ================================
+   CYBER GRID
+   ================================ */
+
+body::before {
+    content: "";
+
+    position: fixed;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    background-image:
+        linear-gradient(
+            rgba(180, 0, 255, 0.045) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(180, 0, 255, 0.045) 1px,
+            transparent 1px
+        );
+
+    background-size: 45px 45px;
+
+    mask-image: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.8),
+        transparent
+    );
+
+    z-index: 0;
+}
+
+
+/* ================================
+   GLOWING ORBS
+   ================================ */
+
+body::after {
+    content: "";
+
+    position: fixed;
+
+    width: 500px;
+    height: 500px;
+
+    top: -250px;
+    right: -150px;
+
+    background: rgba(157, 0, 255, 0.10);
+
+    filter: blur(100px);
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
+    z-index: 0;
+}
+
+
+/* ================================
+   HEADINGS
+   ================================ */
+
+h1,
+h2,
+h3 {
+
+    font-family: "Orbitron", sans-serif;
+
+    color: #ffffff;
+
+    letter-spacing: 1px;
+
+    text-shadow:
+        0 0 10px rgba(170, 0, 255, 0.5);
+}
+
+
+/* ================================
+   CONTAINERS / CARDS
+   ================================ */
+
+.container,
+.dashboard,
+.card,
+.login-box,
+.signup-box {
+
+    position: relative;
+
+    z-index: 2;
+}
+
+
+/* ================================
+   CYBER CARDS
+   ================================ */
+
+.card {
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(25, 18, 38, 0.92),
+            rgba(10, 8, 16, 0.95)
+        );
+
+    border: 1px solid rgba(171, 0, 255, 0.35);
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 0 20px rgba(157, 0, 255, 0.08),
+        inset 0 0 20px rgba(157, 0, 255, 0.025);
+
+    backdrop-filter: blur(12px);
+
+    transition: 0.25s ease;
+}
+
+
+.card:hover {
+
+    transform: translateY(-3px);
+
+    border-color: rgba(200, 80, 255, 0.7);
+
+    box-shadow:
+        0 0 25px rgba(157, 0, 255, 0.18);
+}
+
+
+/* ================================
+   INPUTS
+   ================================ */
+
+input,
+select,
+textarea {
+
+    width: 100%;
+
+    padding: 13px 15px;
+
+    margin-top: 6px;
+
+    margin-bottom: 15px;
+
+    border-radius: 8px;
+
+    border: 1px solid #352440;
+
+    outline: none;
+
+    background: #0d0a13;
+
+    color: #ffffff;
+
+    font-family: "Rajdhani", sans-serif;
+
+    font-size: 16px;
+
+    transition: 0.2s;
+}
+
+
+input::placeholder,
+textarea::placeholder {
+
+    color: #665b70;
+}
+
+
+input:focus,
+select:focus,
+textarea:focus {
+
+    border-color: #c000ff;
+
+    box-shadow:
+        0 0 0 2px rgba(192, 0, 255, 0.12),
+        0 0 15px rgba(192, 0, 255, 0.15);
+}
+
+
+/* ================================
+   LABELS
+   ================================ */
+
+label {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #cfc5d8;
+
+    font-weight: 600;
+
+    letter-spacing: 0.5px;
+}
+
+
+/* ================================
+   BUTTONS
+   ================================ */
+
+button {
+
+    padding: 12px 22px;
+
+    border: 1px solid #c000ff;
+
+    border-radius: 8px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #8c00ff,
+            #d000ff
+        );
+
+    color: white;
+
+    font-family: "Orbitron", sans-serif;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 0 15px rgba(192, 0, 255, 0.25);
+
+    transition: 0.2s;
+}
+
+
+button:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0 25px rgba(192, 0, 255, 0.5);
+
+    filter: brightness(1.15);
+}
+
+
+button:active {
+
+    transform: translateY(0);
+}
+
+
+/* ================================
+   LINKS
+   ================================ */
+
+a {
+
+    color: #d000ff;
+
+    text-decoration: none;
+
+    transition: 0.2s;
+}
+
+
+a:hover {
+
+    color: #ff73ff;
+
+    text-shadow:
+        0 0 10px rgba(208, 0, 255, 0.7);
+}
+
+
+/* ================================
+   TABLE
+   ================================ */
+
+table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    overflow: hidden;
+
+    background: rgba(10, 8, 15, 0.9);
+
+    border: 1px solid #302037;
+
+    border-radius: 10px;
+}
+
+
+th {
+
+    padding: 14px;
+
+    text-align: left;
+
+    font-family: "Orbitron", sans-serif;
+
+    font-size: 11px;
+
+    letter-spacing: 1px;
+
+    color: #d000ff;
+
+    background: #130d19;
+
+    border-bottom: 1px solid #41234e;
+}
+
+
+td {
+
+    padding: 13px;
+
+    border-bottom: 1px solid #241a29;
+
+    color: #ddd5e3;
+
+    font-size: 15px;
+}
+
+
+tr {
+
+    transition: 0.15s;
+}
+
+
+tr:hover {
+
+    background: rgba(192, 0, 255, 0.05);
+}
+
+
+/* ================================
+   PROFIT
+   ================================ */
+
+.profit,
+.green,
+.win {
+
+    color: #00ffd5 !important;
+
+    font-weight: 700;
+
+    text-shadow:
+        0 0 8px rgba(0, 255, 213, 0.35);
+}
+
+
+/* ================================
+   LOSS
+   ================================ */
+
+.loss,
+.red,
+.losses {
+
+    color: #ff3b81 !important;
+
+    font-weight: 700;
+
+    text-shadow:
+        0 0 8px rgba(255, 59, 129, 0.35);
+}
+
+
+/* ================================
+   CYBER DIVIDER
+   ================================ */
+
+hr {
+
+    border: 0;
+
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #c000ff,
+            transparent
+        );
+
+    box-shadow:
+        0 0 10px rgba(192, 0, 255, 0.4);
+
+    margin: 25px 0;
+}
+
+
+/* ================================
+   SCROLLBAR
+   ================================ */
+
+::-webkit-scrollbar {
+
+    width: 8px;
+}
+
+
+::-webkit-scrollbar-track {
+
+    background: #08060d;
+}
+
+
+::-webkit-scrollbar-thumb {
+
+    background: #4b185c;
+
+    border-radius: 10px;
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+
+    background: #c000ff;
+
+    box-shadow:
+        0 0 10px #c000ff;
+}
+
+
+/* ================================
+   SELECTION
+   ================================ */
+
+::selection {
+
+    background: #c000ff;
+
+    color: white;
+}

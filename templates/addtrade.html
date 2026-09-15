@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Trade - Trading Journal</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+    <div class="trade-form-container">
+
+        <div class="trade-form-box">
+
+            <div class="form-header">
+
+                <div>
+                    <h1>Add New Trade</h1>
+
+                    <p>
+                        Record your trade and analyze your setup.
+                    </p>
+                </div>
+
+                <a href="{{ url_for('dashboard') }}">
+                    ← Dashboard
+                </a>
+
+            </div>
+
+
+            <form method="POST">
+
+
+                <!-- DATE & DAY -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label>Date</label>
+
+                        <input
+                            type="date"
+                            name="date"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>Day</label>
+
+                        <input
+                            type="text"
+                            name="day"
+                            placeholder="e.g. Tuesday"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- TICKER -->
+
+                <div class="form-group">
+
+                    <label>Ticker</label>
+
+                    <input
+                        type="text"
+                        name="ticker"
+                        placeholder="e.g. BTC/USDT"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- BUY / SELL -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label>Buying Average</label>
+
+                        <input
+                            type="number"
+                            step="any"
+                            name="buying_average"
+                            placeholder="e.g. 105000"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>Selling Average</label>
+
+                        <input
+                            type="number"
+                            step="any"
+                            name="selling_average"
+                            placeholder="e.g. 108000"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- TP / SL / RISK -->
+
+                <div class="form-row three">
+
+                    <div class="form-group">
+
+                        <label>Take Profit (%)</label>
+
+                        <input
+                            type="number"
+                            step="any"
+                            name="tp"
+                            placeholder="e.g. 8"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>Stop Loss (%)</label>
+
+                        <input
+                            type="number"
+                            step="any"
+                            name="sl"
+                            placeholder="e.g. 2"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>Risk of Capital (%)</label>
+
+                        <input
+                            type="number"
+                            step="any"
+                            name="risk"
+                            placeholder="e.g. 1"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- REASON -->
+
+                <div class="form-group">
+
+                    <label>Reason Behind Trade</label>
+
+                    <textarea
+                        name="reason"
+                        rows="6"
+                        placeholder="Explain why you entered this trade..."
+                        required
+                    ></textarea>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="save-trade-btn"
+                >
+                    Save Trade
+                </button>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Trade | Trading Journal</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(145, 70, 255, 0.18), transparent 35%),
+                radial-gradient(circle at bottom right, rgba(255, 0, 170, 0.12), transparent 35%),
+                #09070f;
+            color: #f5f0ff;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1100px;
+            margin: 40px auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: #ffffff;
+            background: #171222;
+            border: 1px solid #6d35a8;
+            padding: 10px 18px;
+            border-radius: 10px;
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #241535;
+            border-color: #b45cff;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 32px;
+            color: #d9a7ff;
+            text-shadow: 0 0 18px rgba(190, 90, 255, 0.5);
+        }
+
+        .subtitle {
+            margin-top: 8px;
+            color: #a99db8;
+        }
+
+        .card {
+            background: rgba(18, 13, 29, 0.95);
+            border: 1px solid #3d2457;
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 0 35px rgba(130, 45, 220, 0.12);
+        }
+
+        .section-title {
+            color: #dbaaff;
+            font-size: 18px;
+            margin: 25px 0 15px;
+            border-bottom: 1px solid #33203f;
+            padding-bottom: 10px;
+        }
+
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            margin-bottom: 8px;
+            color: #c8bdd2;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 13px 14px;
+            border-radius: 10px;
+            border: 1px solid #43295a;
+            background: #0e0a16;
+            color: #ffffff;
+            outline: none;
+            font-size: 15px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #a855f7;
+            box-shadow: 0 0 12px rgba(168, 85, 247, 0.25);
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .direction-box {
+            display: flex;
+            gap: 12px;
+        }
+
+        .direction-box input {
+            display: none;
+        }
+
+        .direction-box label {
+            flex: 1;
+            margin: 0;
+            padding: 14px;
+            text-align: center;
+            border: 1px solid #43295a;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #0e0a16;
+            transition: 0.2s;
+        }
+
+        .direction-box label:hover {
+            border-color: #a855f7;
+        }
+
+        #long:checked + label {
+            background: rgba(0, 200, 120, 0.15);
+            border-color: #00d084;
+            color: #4dffae;
+        }
+
+        #short:checked + label {
+            background: rgba(255, 50, 90, 0.15);
+            border-color: #ff416c;
+            color: #ff718c;
+        }
+
+        .calculator {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 14px;
+            border: 1px solid #563078;
+            background: linear-gradient(
+                135deg,
+                rgba(98, 38, 150, 0.12),
+                rgba(20, 10, 35, 0.7)
+            );
+        }
+
+        .calculator h3 {
+            margin-top: 0;
+            color: #d9a7ff;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .calc-box {
+            background: #0d0914;
+            border: 1px solid #352044;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .calc-label {
+            font-size: 12px;
+            color: #94889f;
+            margin-bottom: 6px;
+        }
+
+        .calc-value {
+            font-size: 19px;
+            font-weight: bold;
+            color: #d9a7ff;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .save-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 11px;
+            cursor: pointer;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #7c3aed, #a855f7);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.25);
+            transition: 0.2s;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 28px rgba(168, 85, 247, 0.4);
+        }
+
+        .cancel-btn {
+            padding: 15px 25px;
+            border-radius: 11px;
+            border: 1px solid #4a315c;
+            background: #120d1b;
+            color: #cfc4d7;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .cancel-btn:hover {
+            border-color: #a855f7;
+        }
+
+        .hint {
+            color: #81758d;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 750px) {
+            .grid,
+            .calc-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field.full {
+                grid-column: auto;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .cancel-btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="topbar">
+        <div>
+            <h1>Add Trade</h1>
+            <div class="subtitle">
+                Record your setup, risk and result.
+            </div>
+        </div>
+
+        <a href="{{ url_for('dashboard') }}" class="back-btn">
+            ← Dashboard
+        </a>
+    </div>
+
+    <div class="card">
+
+        <form method="POST"
+              action="{{ url_for('add_trade') }}"
+              enctype="multipart/form-data">
+
+            <div class="section-title">Trade Information</div>
+
+            <div class="grid">
+
+                <div class="field">
+                    <label for="date">Date</label>
+                    <input
+                        type="date"
+                        id="date"
+                        name="date"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="day">Day</label>
+                    <input
+                        type="text"
+                        id="day"
+                        name="day"
+                        readonly
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="ticker">Ticker / Coin</label>
+                    <input
+                        type="text"
+                        id="ticker"
+                        name="ticker"
+                        placeholder="BTCUSDT"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label>Direction</label>
+
+                    <div class="direction-box">
+
+                        <input
+                            type="radio"
+                            id="long"
+                            name="direction"
+                            value="LONG"
+                            checked
+                        >
+
+                        <label for="long">
+                            🟢 LONG
+                        </label>
+
+                        <input
+                            type="radio"
+                            id="short"
+                            name="direction"
+                            value="SHORT"
+                        >
+
+                        <label for="short">
+                            🔴 SHORT
+                        </label>
+
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="buying_average">
+                        Buying Average / Entry
+                    </label>
+
+                    <input
+                        type="number"
+                        step="any"
+                        id="buying_average"
+                        name="buying_average"
+                        placeholder="e.g. 105000"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="selling_average">
+                        Selling Average / Exit
+                    </label>
+
+                    <input
+                        type="number"
+                        step="any"
+                        id="selling_average"
+                        name="selling_average"
+                        placeholder="Enter after closing trade"
+                    >
+                </div>
+
+            </div>
+
+
+            <div class="section-title">Risk Management</div>
+
+            <div class="grid">
+
+                <div class="field">
+                    <label for="capital">
+                        Total Capital (USDT)
+                    </label>
+
+                    <input
+                        type="number"
+                        step="any"
+                        id="capital"
+                        name="capital"
+                        value="{{ user.capital_usdt if user else '' }}"
+                        placeholder="e.g. 1000"
+                    >
+
+                    <div class="hint">
+                        Your total trading capital.
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="risk">
+                        Risk of Total Capital (%)
+                    </label>
+
+                    <input
+                        type="number"
+                        step="any"
+                        id="risk"
+                        name="risk"
+                        placeholder="e.g. 1"
+                        required
+                    >
+
+                    <div class="hint">
+                        Example: 1% risk on 1000 USDT = 10 USDT.
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="sl">
+                        Stop Loss (%)
+                    </label>
+
+                    <input
+                        type="number"
+                        step="any"
+                        id="sl"
+                        name="sl"
+                        placeholder="e.g. 2"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="tp">
+                        Take Profit (%)
+                    </label>
+
+                    <input
+                        type="number"
+                        step="any"
+                        id="tp"
+                        name="tp"
+                        placeholder="e.g. 6"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="result">Trade Result</label>
+
+                    <select id="result" name="result" required>
+                        <option value="">Select result</option>
+                        <option value="WIN">WIN</option>
+                        <option value="LOSS">LOSS</option>
+                        <option value="BREAKEVEN">BREAKEVEN</option>
+                    </select>
+                </div>
+
+            </div>
+
+
+            <div class="calculator">
+
+                <h3>⚡ Live Risk Calculator</h3>
+
+                <div class="calc-grid">
+
+                    <div class="calc-box">
+                        <div class="calc-label">
+                            Risk Amount
+                        </div>
+
+                        <div class="calc-value" id="riskAmount">
+                            0 USDT
+                        </div>
+                    </div>
+
+                    <div class="calc-box">
+                        <div class="calc-label">
+                            Position Size
+                        </div>
+
+                        <div class="calc-value" id="positionSize">
+                            0 USDT
+                        </div>
+                    </div>
+
+                    <div class="calc-box">
+                        <div class="calc-label">
+                            Potential Profit
+                        </div>
+
+                        <div class="calc-value" id="potentialProfit">
+                            0 USDT
+                        </div>
+                    </div>
+
+                    <div class="calc-box">
+                        <div class="calc-label">
+                            Potential Loss
+                        </div>
+
+                        <div class="calc-value" id="potentialLoss">
+                            0 USDT
+                        </div>
+                    </div>
+
+                    <div class="calc-box">
+                        <div class="calc-label">
+                            Calculated SL Price
+                        </div>
+
+                        <div class="calc-value" id="slPrice">
+                            —
+                        </div>
+                    </div>
+
+                    <div class="calc-box">
+                        <div class="calc-label">
+                            Calculated TP Price
+                        </div>
+
+                        <div class="calc-value" id="tpPrice">
+                            —
+                        </div>
+                    </div>
+
+                    <div class="calc-box">
+                        <div class="calc-label">
+                            Risk : Reward
+                        </div>
+
+                        <div class="calc-value" id="rr">
+                            —
+                        </div>
+                    </div>
+
+                    <div class="calc-box">
+                        <div class="calc-label">
+                            Capital After Loss
+                        </div>
+
+                        <div class="calc-value" id="capitalAfterLoss">
+                            0 USDT
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="section-title">Trade Setup</div>
+
+            <div class="grid">
+
+                <div class="field">
+                    <label for="strategy">
+                        Strategy
+                    </label>
+
+                    <input
+                        type="text"
+                        id="strategy"
+                        name="strategy"
+                        placeholder="CISD / BPR / Breakout / etc."
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="screenshot">
+                        Chart Screenshot
+                    </label>
+
+                    <input
+                        type="file"
+                        id="screenshot"
+                        name="screenshot"
+                        accept="image/*"
+                    >
+                </div>
+
+                <div class="field full">
+                    <label for="reason">
+                        Reason for Trade
+                    </label>
+
+                    <textarea
+                        id="reason"
+                        name="reason"
+                        placeholder="Why did you take this trade?"
+                    ></textarea>
+                </div>
+
+                <div class="field full">
+                    <label for="notes">
+                        Notes
+                    </label>
+
+                    <textarea
+                        id="notes"
+                        name="notes"
+                        placeholder="What did you learn from this trade?"
+                    ></textarea>
+                </div>
+
+            </div>
+
+
+            <div class="buttons">
+
+                <a
+                    href="{{ url_for('dashboard') }}"
+                    class="cancel-btn"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="save-btn"
+                >
+                    🚀 Save Trade
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const dateInput = document.getElementById("date");
+    const dayInput = document.getElementById("day");
+
+    const capitalInput = document.getElementById("capital");
+    const riskInput = document.getElementById("risk");
+    const slInput = document.getElementById("sl");
+    const tpInput = document.getElementById("tp");
+    const entryInput = document.getElementById("buying_average");
+
+    function updateDay() {
+
+        if (!dateInput.value) {
+            dayInput.value = "";
+            return;
+        }
+
+        const date = new Date(dateInput.value + "T00:00:00");
+
+        const days = [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+        ];
+
+        dayInput.value = days[date.getDay()];
+    }
+
+
+    function calculate() {
+
+        const capital =
+            parseFloat(capitalInput.value) || 0;
+
+        const risk =
+            parseFloat(riskInput.value) || 0;
+
+        const sl =
+            parseFloat(slInput.value) || 0;
+
+        const tp =
+            parseFloat(tpInput.value) || 0;
+
+        const entry =
+            parseFloat(entryInput.value) || 0;
+
+
+        const riskAmount =
+            capital * (risk / 100);
+
+        let positionSize = 0;
+
+        if (sl > 0) {
+            positionSize =
+                riskAmount / (sl / 100);
+        }
+
+        const potentialProfit =
+            positionSize * (tp / 100);
+
+        const potentialLoss =
+            riskAmount;
+
+        let slPrice = 0;
+        let tpPrice = 0;
+
+
+        const direction =
+            document.querySelector(
+                'input[name="direction"]:checked'
+            )?.value;
+
+
+        if (entry > 0) {
+
+            if (direction === "LONG") {
+
+                slPrice =
+                    entry * (1 - sl / 100);
+
+                tpPrice =
+                    entry * (1 + tp / 100);
+
+            } else {
+
+                slPrice =
+                    entry * (1 + sl / 100);
+
+                tpPrice =
+                    entry * (1 - tp / 100);
+
+            }
+        }
+
+
+        const rr =
+            sl > 0
+                ? (tp / sl).toFixed(2)
+                : "—";
+
+
+        const capitalAfterLoss =
+            capital - potentialLoss;
+
+
+        document.getElementById("riskAmount").textContent =
+            riskAmount.toFixed(2) + " USDT";
+
+        document.getElementById("positionSize").textContent =
+            positionSize.toFixed(2) + " USDT";
+
+        document.getElementById("potentialProfit").textContent =
+            potentialProfit.toFixed(2) + " USDT";
+
+        document.getElementById("potentialLoss").textContent =
+            potentialLoss.toFixed(2) + " USDT";
+
+        document.getElementById("slPrice").textContent =
+            slPrice > 0
+                ? slPrice.toFixed(6)
+                : "—";
+
+        document.getElementById("tpPrice").textContent =
+            tpPrice > 0
+                ? tpPrice.toFixed(6)
+                : "—";
+
+        document.getElementById("rr").textContent =
+            rr === "—"
+                ? "—"
+                : "1 : " + rr;
+
+        document.getElementById("capitalAfterLoss").textContent =
+            capitalAfterLoss.toFixed(2) + " USDT";
+    }
+
+
+    dateInput.addEventListener("change", updateDay);
+
+    [
+        capitalInput,
+        riskInput,
+        slInput,
+        tpInput,
+        entryInput
+    ].forEach(function(input) {
+
+        input.addEventListener("input", calculate);
+
+    });
+
+
+    document.querySelectorAll(
+        'input[name="direction"]'
+    ).forEach(function(input) {
+
+        input.addEventListener("change", calculate);
+
+    });
+
+
+    // Automatically set today's date
+    if (!dateInput.value) {
+
+        const today =
+            new Date();
+
+        const year =
+            today.getFullYear();
+
+        const month =
+            String(today.getMonth() + 1)
+                .padStart(2, "0");
+
+        const day =
+            String(today.getDate())
+                .padStart(2, "0");
+
+        dateInput.value =
+            `${year}-${month}-${day}`;
+
+        updateDay();
+    }
+
+
+    calculate();
+
+</script>
+
+</body>
+</html>

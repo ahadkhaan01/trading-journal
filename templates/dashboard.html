@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Trading Journal | Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(145, 70, 255, 0.15), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(255, 0, 170, 0.10), transparent 30%),
+                #08060d;
+            color: #f5f0ff;
+        }
+
+        .container {
+            width: 94%;
+            max-width: 1400px;
+            margin: 30px auto;
+        }
+
+        /* HEADER */
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 32px;
+            color: #dda7ff;
+            text-shadow: 0 0 18px rgba(180, 80, 255, 0.5);
+        }
+
+        .welcome {
+            color: #92859f;
+            margin-top: 7px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            text-decoration: none;
+            color: white;
+            padding: 11px 17px;
+            border-radius: 10px;
+            border: 1px solid #4b2b62;
+            background: #15101d;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            border-color: #ad5cff;
+            background: #241432;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #7135c7, #a855f7);
+            border: none;
+        }
+
+        .btn-danger {
+            border-color: #64293c;
+        }
+
+        /* CAPITAL */
+
+        .capital-card {
+            background: rgba(18, 13, 29, 0.95);
+            border: 1px solid #422556;
+            border-radius: 17px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .capital-form {
+            display: flex;
+            gap: 10px;
+            max-width: 500px;
+        }
+
+        .capital-form input {
+            flex: 1;
+        }
+
+        input,
+        select {
+            padding: 12px;
+            background: #0d0914;
+            color: white;
+            border: 1px solid #43295a;
+            border-radius: 9px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #a855f7;
+        }
+
+        /* STAT CARDS */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .stat {
+            background: rgba(18, 13, 29, 0.95);
+            border: 1px solid #382149;
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .stat-title {
+            color: #91839d;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 25px;
+            font-weight: bold;
+            color: #dfb1ff;
+        }
+
+        .positive {
+            color: #36e99a !important;
+        }
+
+        .negative {
+            color: #ff5577 !important;
+        }
+
+        /* ANALYTICS */
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .panel {
+            background: rgba(18, 13, 29, 0.95);
+            border: 1px solid #382149;
+            border-radius: 17px;
+            padding: 22px;
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            color: #dba6ff;
+            font-size: 19px;
+        }
+
+        .metric-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .metric {
+            background: #0d0914;
+            border: 1px solid #2e1d3d;
+            border-radius: 10px;
+            padding: 13px;
+        }
+
+        .metric-name {
+            font-size: 12px;
+            color: #83758e;
+            margin-bottom: 6px;
+        }
+
+        .metric-value {
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        /* CHART */
+
+        .chart-panel {
+            background: rgba(18, 13, 29, 0.95);
+            border: 1px solid #382149;
+            border-radius: 17px;
+            padding: 22px;
+            margin-bottom: 25px;
+        }
+
+        .chart-box {
+            height: 330px;
+            position: relative;
+        }
+
+        /* FILTER */
+
+        .filter-panel {
+            background: rgba(18, 13, 29, 0.95);
+            border: 1px solid #382149;
+            border-radius: 17px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* TABLE */
+
+        .trades-panel {
+            background: rgba(18, 13, 29, 0.95);
+            border: 1px solid #382149;
+            border-radius: 17px;
+            padding: 22px;
+            overflow-x: auto;
+        }
+
+        .trades-panel h2 {
+            color: #dba6ff;
+            margin-top: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        th {
+            color: #95879f;
+            font-size: 12px;
+            text-align: left;
+            padding: 13px 10px;
+            border-bottom: 1px solid #34203f;
+        }
+
+        td {
+            padding: 14px 10px;
+            border-bottom: 1px solid #21172a;
+            font-size: 13px;
+        }
+
+        tr:hover {
+            background: rgba(168, 85, 247, 0.05);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 7px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .win {
+            background: rgba(0, 220, 130, 0.12);
+            color: #39ed9d;
+        }
+
+        .loss {
+            background: rgba(255, 50, 90, 0.12);
+            color: #ff5577;
+        }
+
+        .breakeven {
+            background: rgba(255, 190, 0, 0.12);
+            color: #ffc533;
+        }
+
+        .long {
+            color: #40e9a0;
+        }
+
+        .short {
+            color: #ff5b7a;
+        }
+
+        .actions {
+            display: flex;
+            gap: 7px;
+        }
+
+        .small-btn {
+            text-decoration: none;
+            padding: 6px 9px;
+            border-radius: 6px;
+            border: 1px solid #392149;
+            color: #cdbed5;
+            font-size: 11px;
+        }
+
+        .small-btn:hover {
+            border-color: #a855f7;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 50px;
+            color: #756a80;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1000px) {
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 650px) {
+
+            .container {
+                width: 94%;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                grid-template-columns: 1fr;
+            }
+
+            .capital-form {
+                flex-direction: column;
+            }
+
+            .metric-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div>
+            <h1>⚡ Trading Journal</h1>
+
+            <div class="welcome">
+                Welcome back, {{ user.email }}
+            </div>
+        </div>
+
+        <div class="header-buttons">
+
+            <a
+                href="{{ url_for('add_trade') }}"
+                class="btn btn-primary"
+            >
+                + Add Trade
+            </a>
+
+            <a
+                href="{{ url_for('export_csv') }}"
+                class="btn"
+            >
+                Export CSV
+            </a>
+
+            <a
+                href="{{ url_for('logout') }}"
+                class="btn btn-danger"
+            >
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- CAPITAL -->
+
+    <div class="capital-card">
+
+        <h3>💰 Trading Capital</h3>
+
+        <form
+            method="POST"
+            action="{{ url_for('update_capital') }}"
+            class="capital-form"
+        >
+
+            <input
+                type="number"
+                step="any"
+                name="capital_usdt"
+                value="{{ user.capital_usdt or 0 }}"
+                placeholder="Capital in USDT"
+                required
+            >
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Update Capital
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- MAIN STATS -->
+
+    <div class="stats">
+
+        <div class="stat">
+
+            <div class="stat-title">
+                TOTAL P&L
+            </div>
+
+            <div
+                class="stat-value {% if total_pnl >= 0 %}positive{% else %}negative{% endif %}"
+            >
+                {{ "%.2f"|format(total_pnl) }} USDT
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-title">
+                WIN RATE
+            </div>
+
+            <div class="stat-value">
+                {{ "%.1f"|format(win_rate) }}%
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-title">
+                TOTAL TRADES
+            </div>
+
+            <div class="stat-value">
+                {{ total_trades }}
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-title">
+                PROFIT FACTOR
+            </div>
+
+            <div class="stat-value">
+                {% if profit_factor == "∞" %}
+                    ∞
+                {% else %}
+                    {{ "%.2f"|format(profit_factor) }}
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ADVANCED METRICS -->
+
+    <div class="analytics-grid">
+
+        <div class="panel">
+
+            <h2>📊 Performance Analytics</h2>
+
+            <div class="metric-list">
+
+                <div class="metric">
+                    <div class="metric-name">Winning Trades</div>
+                    <div class="metric-value positive">
+                        {{ winning_trades }}
+                    </div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-name">Losing Trades</div>
+                    <div class="metric-value negative">
+                        {{ losing_trades }}
+                    </div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-name">Average Win</div>
+                    <div class="metric-value positive">
+                        {{ "%.2f"|format(avg_win) }} USDT
+                    </div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-name">Average Loss</div>
+                    <div class="metric-value negative">
+                        {{ "%.2f"|format(avg_loss) }} USDT
+                    </div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-name">Best Trade</div>
+                    <div class="metric-value positive">
+                        {{ "%.2f"|format(best_trade) }} USDT
+                    </div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-name">Worst Trade</div>
+                    <div class="metric-value negative">
+                        {{ "%.2f"|format(worst_trade) }} USDT
+                    </div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-name">Average R:R</div>
+                    <div class="metric-value">
+                        1 : {{ "%.2f"|format(avg_rr) }}
+                    </div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-name">Max Drawdown</div>
+                    <div class="metric-value negative">
+                        {{ "%.2f"|format(max_drawdown) }} USDT
+                    </div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-name">Total Risk Taken</div>
+                    <div class="metric-value">
+                        {{ "%.2f"|format(total_risk) }} USDT
+                    </div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-name">Breakeven Trades</div>
+                    <div class="metric-value">
+                        {{ breakeven_trades }}
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- LONG SHORT -->
+
+        <div class="panel">
+
+            <h2>⚔️ Long vs Short</h2>
+
+            <div class="metric-list">
+
+                <div class="metric">
+
+                    <div class="metric-name">
+                        LONG TRADES
+                    </div>
+
+                    <div class="metric-value">
+                        {{ long_count }}
+                    </div>
+
+                </div>
+
+                <div class="metric">
+
+                    <div class="metric-name">
+                        SHORT TRADES
+                    </div>
+
+                    <div class="metric-value">
+                        {{ short_count }}
+                    </div>
+
+                </div>
+
+                <div class="metric">
+
+                    <div class="metric-name">
+                        LONG P&L
+                    </div>
+
+                    <div
+                        class="metric-value {% if long_pnl >= 0 %}positive{% else %}negative{% endif %}"
+                    >
+                        {{ "%.2f"|format(long_pnl) }} USDT
+                    </div>
+
+                </div>
+
+                <div class="metric">
+
+                    <div class="metric-name">
+                        SHORT P&L
+                    </div>
+
+                    <div
+                        class="metric-value {% if short_pnl >= 0 %}positive{% else %}negative{% endif %}"
+                    >
+                        {{ "%.2f"|format(short_pnl) }} USDT
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <h2 style="margin-top:30px;">
+                🏆 Top Performing Coin
+            </h2>
+
+            {% if top_coin %}
+                <div class="metric">
+
+                    <div class="metric-name">
+                        BEST COIN
+                    </div>
+
+                    <div class="metric-value positive">
+                        {{ top_coin }}
+                    </div>
+
+                    <div style="margin-top:6px;color:#8f819b;">
+                        {{ "%.2f"|format(top_coin_pnl) }} USDT
+                    </div>
+
+                </div>
+            {% else %}
+
+                <div class="metric">
+                    No trades yet.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- EQUITY CURVE -->
+
+    <div class="chart-panel">
+
+        <h2>📈 Equity Curve</h2>
+
+        <div class="chart-box">
+            <canvas id="equityChart"></canvas>
+        </div>
+
+    </div>
+
+
+    <!-- DAILY PNL -->
+
+    <div class="chart-panel">
+
+        <h2>📅 Daily P&L</h2>
+
+        <div class="chart-box">
+            <canvas id="pnlChart"></canvas>
+        </div>
+
+    </div>
+
+
+    <!-- STRATEGY PERFORMANCE -->
+
+    <div class="chart-panel">
+
+        <h2>🧠 Strategy Performance</h2>
+
+        <div class="chart-box">
+            <canvas id="strategyChart"></canvas>
+        </div>
+
+    </div>
+
+
+    <!-- FILTERS -->
+
+    <div class="filter-panel">
+
+        <h2>🔎 Trade History</h2>
+
+        <form method="GET">
+
+            <div class="filters">
+
+                <input
+                    type="text"
+                    name="search"
+                    placeholder="Search ticker, strategy..."
+                    value="{{ search }}"
+                >
+
+                <select name="result">
+
+                    <option value="">
+                        All Results
+                    </option>
+
+                    <option
+                        value="WIN"
+                        {% if result_filter == "WIN" %}selected{% endif %}
+                    >
+                        WIN
+                    </option>
+
+                    <option
+                        value="LOSS"
+                        {% if result_filter == "LOSS" %}selected{% endif %}
+                    >
+                        LOSS
+                    </option>
+
+                    <option
+                        value="BREAKEVEN"
+                        {% if result_filter == "BREAKEVEN" %}selected{% endif %}
+                    >
+                        BREAKEVEN
+                    </option>
+
+                </select>
+
+
+                <select name="direction">
+
+                    <option value="">
+                        All Directions
+                    </option>
+
+                    <option
+                        value="LONG"
+                        {% if direction_filter == "LONG" %}selected{% endif %}
+                    >
+                        LONG
+                    </option>
+
+                    <option
+                        value="SHORT"
+                        {% if direction_filter == "SHORT" %}selected{% endif %}
+                    >
+                        SHORT
+                    </option>
+
+                </select>
+
+            </div>
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+                style="margin-top:12px;"
+            >
+                Apply Filters
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- TRADE TABLE -->
+
+    <div class="trades-panel">
+
+        <h2>📒 All Trades</h2>
+
+        {% if trades %}
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Date</th>
+                    <th>Ticker</th>
+                    <th>Direction</th>
+                    <th>Entry</th>
+                    <th>Exit</th>
+                    <th>TP %</th>
+                    <th>SL %</th>
+                    <th>Risk %</th>
+                    <th>Result</th>
+                    <th>P&L</th>
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for trade in trades %}
+
+                <tr>
+
+                    <td>
+                        {{ trade.date }}
+                    </td>
+
+                    <td>
+                        <strong>
+                            {{ trade.ticker }}
+                        </strong>
+                    </td>
+
+                    <td>
+
+                        {% if trade.direction == "LONG" %}
+
+                            <span class="long">
+                                🟢 LONG
+                            </span>
+
+                        {% else %}
+
+                            <span class="short">
+                                🔴 SHORT
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ trade.entry }}
+                    </td>
+
+                    <td>
+                        {{ trade.exit if trade.exit else "-" }}
+                    </td>
+
+                    <td>
+                        {{ trade.tp }}%
+                    </td>
+
+                    <td>
+                        {{ trade.sl }}%
+                    </td>
+
+                    <td>
+                        {{ trade.risk }}%
+                    </td>
+
+                    <td>
+
+                        {% if trade.result == "WIN" %}
+
+                            <span class="badge win">
+                                WIN
+                            </span>
+
+                        {% elif trade.result == "LOSS" %}
+
+                            <span class="badge loss">
+                                LOSS
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge breakeven">
+                                BREAKEVEN
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <strong
+                            class="{% if trade.pnl_money >= 0 %}positive{% else %}negative{% endif %}"
+                        >
+                            {{ "%.2f"|format(trade.pnl_money) }}
+                            USDT
+                        </strong>
+
+                    </td>
+
+                    <td>
+
+                        <div class="actions">
+
+                            <a
+                                href="{{ url_for('edit_trade', trade_id=trade.id) }}"
+                                class="small-btn"
+                            >
+                                Edit
+                            </a>
+
+                            <a
+                                href="{{ url_for('delete_trade', trade_id=trade.id) }}"
+                                class="small-btn"
+                                onclick="return confirm('Delete this trade?')"
+                            >
+                                Delete
+                            </a>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+            <div class="empty">
+                No trades found.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const dailyLabels =
+        {{ daily_labels | tojson }};
+
+    const dailyPnl =
+        {{ daily_pnl | tojson }};
+
+    const equityLabels =
+        {{ equity_labels | tojson }};
+
+    const equityValues =
+        {{ equity_values | tojson }};
+
+    const strategyLabels =
+        {{ strategy_labels | tojson }};
+
+    const strategyValues =
+        {{ strategy_values | tojson }};
+
+
+    /* EQUITY CURVE */
+
+    new Chart(
+        document.getElementById("equityChart"),
+        {
+            type: "line",
+
+            data: {
+                labels: equityLabels,
+
+                datasets: [
+                    {
+                        label: "Equity",
+
+                        data: equityValues,
+
+                        borderColor: "#b45cff",
+
+                        backgroundColor:
+                            "rgba(180, 92, 255, 0.10)",
+
+                        fill: true,
+
+                        tension: 0.35,
+
+                        pointRadius: 3
+                    }
+                ]
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "#cdbed5"
+                        }
+                    }
+                },
+
+                scales: {
+
+                    x: {
+                        ticks: {
+                            color: "#84758e"
+                        },
+
+                        grid: {
+                            color: "rgba(255,255,255,0.04)"
+                        }
+                    },
+
+                    y: {
+                        ticks: {
+                            color: "#84758e"
+                        },
+
+                        grid: {
+                            color: "rgba(255,255,255,0.04)"
+                        }
+                    }
+
+                }
+
+            }
+        }
+    );
+
+
+    /* DAILY PNL */
+
+    new Chart(
+        document.getElementById("pnlChart"),
+        {
+            type: "bar",
+
+            data: {
+                labels: dailyLabels,
+
+                datasets: [
+                    {
+                        label: "Daily P&L",
+
+                        data: dailyPnl,
+
+                        backgroundColor:
+                            dailyPnl.map(
+                                value =>
+                                    value >= 0
+                                        ? "#31e99a"
+                                        : "#ff5577"
+                            ),
+
+                        borderRadius: 5
+                    }
+                ]
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "#cdbed5"
+                        }
+                    }
+                },
+
+                scales: {
+
+                    x: {
+                        ticks: {
+                            color: "#84758e"
+                        },
+
+                        grid: {
+                            display: false
+                        }
+                    },
+
+                    y: {
+                        ticks: {
+                            color: "#84758e"
+                        },
+
+                        grid: {
+                            color: "rgba(255,255,255,0.04)"
+                        }
+                    }
+
+                }
+
+            }
+        }
+    );
+
+
+    /* STRATEGY */
+
+    new Chart(
+        document.getElementById("strategyChart"),
+        {
+            type: "bar",
+
+            data: {
+                labels: strategyLabels,
+
+                datasets: [
+                    {
+                        label: "Strategy P&L",
+
+                        data: strategyValues,
+
+                        backgroundColor:
+                            strategyValues.map(
+                                value =>
+                                    value >= 0
+                                        ? "#31e99a"
+                                        : "#ff5577"
+                            ),
+
+                        borderRadius: 5
+                    }
+                ]
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "#cdbed5"
+                        }
+                    }
+                },
+
+                scales: {
+
+                    x: {
+                        ticks: {
+                            color: "#84758e"
+                        },
+
+                        grid: {
+                            display: false
+                        }
+                    },
+
+                    y: {
+                        ticks: {
+                            color: "#84758e"
+                        },
+
+                        grid: {
+                            color: "rgba(255,255,255,0.04)"
+                        }
+                    }
+
+                }
+
+            }
+        }
+    );
+
+</script>
+
+</body>
+</html>
