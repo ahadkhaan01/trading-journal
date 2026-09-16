@@ -213,6 +213,39 @@
             position: relative;
         }
 
+        /* LIVE TRADINGVIEW CHART */
+
+        .live-chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .symbol-form {
+            display: flex;
+            gap: 8px;
+        }
+
+        .symbol-form input {
+            width: 220px;
+        }
+
+        .tv-chart-box {
+            height: 520px;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #2e1d3d;
+        }
+
+        .tradingview-widget-container {
+            height: 100%;
+            width: 100%;
+        }
+
         /* FILTER */
 
         .filter-panel {
@@ -363,6 +396,19 @@
             .metric-list {
                 grid-template-columns: 1fr;
             }
+
+            .live-chart-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .symbol-form input {
+                width: 100%;
+            }
+
+            .tv-chart-box {
+                height: 380px;
+            }
         }
     </style>
 </head>
@@ -503,6 +549,44 @@
                 {% endif %}
             </div>
 
+        </div>
+
+    </div>
+
+
+    <!-- LIVE TRADINGVIEW CHART -->
+
+    <div class="chart-panel">
+
+        <div class="live-chart-header">
+
+            <h2 style="margin:0;">📉 Live Chart</h2>
+
+            <div class="symbol-form">
+
+                <input
+                    type="text"
+                    id="tvSymbolInput"
+                    placeholder="e.g. BINANCE:BTCUSDT.P"
+                    value="BINANCE:BTCUSDT.P"
+                >
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    onclick="loadTradingViewChart()"
+                >
+                    Load
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="tv-chart-box">
+            <div class="tradingview-widget-container" id="tv_chart_container">
+                <div id="tradingview_chart" style="height:100%;width:100%;"></div>
+            </div>
         </div>
 
     </div>
@@ -836,6 +920,7 @@
                     <th>Risk %</th>
                     <th>Result</th>
                     <th>P&L</th>
+                    <th>Chart</th>
                     <th>Actions</th>
 
                 </tr>
@@ -933,6 +1018,18 @@
 
                     <td>
 
+                        <a
+                            href="#"
+                            class="small-btn"
+                            onclick="viewTradeChart('{{ trade.ticker }}'); return false;"
+                        >
+                            View
+                        </a>
+
+                    </td>
+
+                    <td>
+
                         <div class="actions">
 
                             <a
@@ -975,7 +1072,77 @@
 </div>
 
 
+<!-- TradingView widget library -->
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+
 <script>
+
+    /* ================= TRADINGVIEW LIVE CHART ================= */
+
+    function loadTradingViewChart() {
+
+        const rawInput = document.getElementById("tvSymbolInput").value.trim();
+
+        // Allow plain tickers like "BTCUSDT" -> default to Binance futures perpetual
+        let symbol = rawInput;
+
+        if (symbol && !symbol.includes(":")) {
+            symbol = "BINANCE:" + symbol.toUpperCase();
+
+            if (!symbol.endsWith(".P") && !symbol.includes("USD")) {
+                // leave as-is if it doesn't look like a USDT pair
+            }
+        }
+
+        if (!symbol) {
+            symbol = "BINANCE:BTCUSDT.P";
+        }
+
+        // Clear previous widget instance before re-rendering
+        const container = document.getElementById("tradingview_chart");
+        container.innerHTML = "";
+
+        new TradingView.widget({
+            "autosize": true,
+            "symbol": symbol,
+            "interval": "60",
+            "timezone": "Etc/UTC",
+            "theme": "dark",
+            "style": "1",
+            "locale": "en",
+            "toolbar_bg": "#15101d",
+            "enable_publishing": false,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "studies": [
+                "STD;SMA"
+            ],
+            "backgroundColor": "#0d0914",
+            "gridColor": "rgba(255, 255, 255, 0.04)",
+            "container_id": "tradingview_chart"
+        });
+    }
+
+    // Enter key triggers chart load from the symbol input
+    document.getElementById("tvSymbolInput").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            loadTradingViewChart();
+        }
+    });
+
+    // Jump the live chart to a specific trade's ticker from the trade table
+    function viewTradeChart(ticker) {
+        const input = document.getElementById("tvSymbolInput");
+        input.value = ticker;
+        loadTradingViewChart();
+        document.querySelector(".chart-panel").scrollIntoView({ behavior: "smooth" });
+    }
+
+    // Initial load on page ready
+    window.addEventListener("DOMContentLoaded", loadTradingViewChart);
+
+
+    /* ================= EXISTING CHART.JS ANALYTICS ================= */
 
     const dailyLabels =
         {{ daily_labels | tojson }};

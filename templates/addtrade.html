@@ -1,73 +1,457 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Trade — Trading Journal</title>
 
-    <title>Add Trade - Trading Journal</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+        body {
+            font-family: Arial, sans-serif;
+            background: #08080d;
+            color: #f5f5f5;
+            min-height: 100vh;
+        }
 
+        .page {
+            width: 96%;
+            max-width: 1550px;
+            margin: auto;
+            padding: 25px 0 40px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 43px;
+            height: 43px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg,#8b5cf6,#4f46e5);
+            font-size: 20px;
+        }
+
+        .brand h1 {
+            font-size: 20px;
+        }
+
+        .brand p {
+            color: #858593;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .back {
+            color: #ddd;
+            text-decoration: none;
+            padding: 10px 15px;
+            border: 1px solid #252530;
+            border-radius: 9px;
+            font-size: 13px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 470px 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: #111119;
+            border: 1px solid #24242e;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .form-card {
+            padding: 23px;
+        }
+
+        .title {
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #858593;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .capital {
+            background: rgba(139,92,246,.1);
+            border: 1px solid rgba(139,92,246,.2);
+            padding: 13px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+        }
+
+        .capital small {
+            color: #888895;
+            display: block;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .capital strong {
+            font-size: 18px;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .row3 {
+            grid-template-columns: repeat(3,1fr);
+        }
+
+        .group {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            color: #bbbcc8;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            background: #0b0b11;
+            color: white;
+            border: 1px solid #282832;
+            border-radius: 9px;
+            padding: 11px;
+            outline: none;
+            font-size: 13px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #8b5cf6;
+        }
+
+        textarea {
+            min-height: 85px;
+            resize: vertical;
+        }
+
+        .choices {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .choices.three {
+            grid-template-columns: repeat(3,1fr);
+        }
+
+        .choice input {
+            display: none;
+        }
+
+        .choice label {
+            cursor: pointer;
+            text-align: center;
+            background: #0b0b11;
+            border: 1px solid #282832;
+            border-radius: 9px;
+            padding: 11px 5px;
+            color: #9999a6;
+            margin: 0;
+        }
+
+        .choice input:checked + label {
+            border-color: #8b5cf6;
+            background: rgba(139,92,246,.15);
+            color: white;
+        }
+
+        .win input:checked + label {
+            border-color: #22c55e;
+            background: rgba(34,197,94,.1);
+        }
+
+        .loss input:checked + label {
+            border-color: #ef4444;
+            background: rgba(239,68,68,.1);
+        }
+
+        .be input:checked + label {
+            border-color: #f59e0b;
+            background: rgba(245,158,11,.1);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 8px;
+            margin: 5px 0 17px;
+        }
+
+        .stat {
+            background: #0c0c13;
+            border: 1px solid #24242d;
+            border-radius: 9px;
+            padding: 10px;
+        }
+
+        .stat span {
+            color: #777784;
+            font-size: 9px;
+            display: block;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .stat strong {
+            font-size: 12px;
+        }
+
+        .save {
+            width: 100%;
+            border: 0;
+            background: linear-gradient(135deg,#8b5cf6,#6d28d9);
+            color: white;
+            padding: 13px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .save:hover {
+            opacity: .9;
+        }
+
+        /* TRADINGVIEW */
+
+        .chart-header {
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            border-bottom: 1px solid #24242e;
+        }
+
+        .chart-title {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .chart-title small {
+            display: block;
+            color: #777784;
+            font-size: 10px;
+            font-weight: normal;
+            margin-top: 4px;
+        }
+
+        .chart-tools {
+            display: flex;
+            gap: 7px;
+        }
+
+        .chart-tools input {
+            width: 145px;
+            padding: 9px;
+        }
+
+        .chart-tools button {
+            background: #8b5cf6;
+            color: white;
+            border: 0;
+            border-radius: 8px;
+            padding: 0 13px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .chart {
+            height: 650px;
+            width: 100%;
+        }
+
+        .tradingview-widget-container {
+            height: 100%;
+            width: 100%;
+        }
+
+        .tradingview-widget-container__widget {
+            height: calc(100% - 32px);
+            width: 100%;
+        }
+
+        .tradingview-widget-copyright {
+            font-size: 10px;
+            padding: 5px 10px;
+            color: #777;
+        }
+
+        .tradingview-widget-copyright a {
+            color: #999;
+            text-decoration: none;
+        }
+
+        @media(max-width:1100px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width:600px) {
+            .row,
+            .row3 {
+                grid-template-columns: 1fr;
+            }
+
+            .chart {
+                height: 500px;
+            }
+
+            .chart-header {
+                height: auto;
+                gap: 10px;
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .chart-tools {
+                width: 100%;
+            }
+
+            .chart-tools input {
+                flex: 1;
+                width: auto;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <div class="trade-form-container">
+<div class="page">
 
-        <div class="trade-form-box">
+    <div class="topbar">
 
-            <div class="form-header">
+        <div class="brand">
+            <div class="logo">⚡</div>
 
-                <div>
-                    <h1>Add New Trade</h1>
+            <div>
+                <h1>Trading Journal</h1>
+                <p>Professional trade execution & analysis</p>
+            </div>
+        </div>
 
-                    <p>
-                        Record your trade and analyze your setup.
-                    </p>
-                </div>
+        <a href="{{ url_for('dashboard') }}" class="back">
+            ← Dashboard
+        </a>
 
-                <a href="{{ url_for('dashboard') }}">
-                    ← Dashboard
-                </a>
+    </div>
+
+
+    <div class="layout">
+
+        <!-- ================= FORM ================= -->
+
+        <div class="card form-card">
+
+            <div class="title">
+                {% if edit_mode %}
+                    Edit Trade
+                {% else %}
+                    Add New Trade
+                {% endif %}
+            </div>
+
+            <div class="subtitle">
+                Record your setup, execution and risk.
+            </div>
+
+
+            <div class="capital">
+
+                <small>Account Capital</small>
+
+                <strong>
+                    {{ "%.2f"|format(user.capital_usdt or 0) }} USDT
+                </strong>
 
             </div>
 
 
-            <form method="POST">
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+                action="{% if edit_mode %}{{ url_for('edit_trade', trade_id=trade.id) }}{% else %}{{ url_for('add_trade') }}{% endif %}"
+            >
+
+                <input
+                    type="hidden"
+                    name="capital"
+                    value="{{ user.capital_usdt or 0 }}"
+                    id="capital"
+                >
 
 
-                <!-- DATE & DAY -->
+                <!-- DATE -->
 
-                <div class="form-row">
+                <div class="row">
 
-                    <div class="form-group">
-
+                    <div class="group">
                         <label>Date</label>
 
                         <input
                             type="date"
                             name="date"
+                            id="tradeDate"
+                            value="{{ trade.date if edit_mode else '' }}"
                             required
                         >
-
                     </div>
 
-
-                    <div class="form-group">
-
+                    <div class="group">
                         <label>Day</label>
 
                         <input
                             type="text"
                             name="day"
-                            placeholder="e.g. Tuesday"
+                            id="tradeDay"
+                            value="{{ trade.day if edit_mode else '' }}"
                             required
                         >
-
                     </div>
 
                 </div>
@@ -75,25 +459,68 @@
 
                 <!-- TICKER -->
 
-                <div class="form-group">
+                <div class="group">
 
                     <label>Ticker</label>
 
                     <input
                         type="text"
                         name="ticker"
-                        placeholder="e.g. BTC/USDT"
+                        id="ticker"
+                        value="{{ trade.ticker if edit_mode else '' }}"
+                        placeholder="BTC/USDT"
                         required
                     >
 
                 </div>
 
 
-                <!-- BUY / SELL -->
+                <!-- DIRECTION -->
 
-                <div class="form-row">
+                <div class="group">
 
-                    <div class="form-group">
+                    <label>Direction</label>
+
+                    <div class="choices">
+
+                        <div class="choice">
+
+                            <input
+                                type="radio"
+                                id="long"
+                                name="direction"
+                                value="LONG"
+                                {% if not edit_mode or trade.direction == "LONG" %}checked{% endif %}
+                            >
+
+                            <label for="long">↗ LONG</label>
+
+                        </div>
+
+                        <div class="choice">
+
+                            <input
+                                type="radio"
+                                id="short"
+                                name="direction"
+                                value="SHORT"
+                                {% if edit_mode and trade.direction == "SHORT" %}checked{% endif %}
+                            >
+
+                            <label for="short">↘ SHORT</label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ENTRY EXIT -->
+
+                <div class="row">
+
+                    <div class="group">
 
                         <label>Buying Average</label>
 
@@ -101,14 +528,14 @@
                             type="number"
                             step="any"
                             name="buying_average"
-                            placeholder="e.g. 105000"
+                            value="{{ trade.buying_average if edit_mode else '' }}"
+                            placeholder="105000"
                             required
                         >
 
                     </div>
 
-
-                    <div class="form-group">
+                    <div class="group">
 
                         <label>Selling Average</label>
 
@@ -116,7 +543,8 @@
                             type="number"
                             step="any"
                             name="selling_average"
-                            placeholder="e.g. 108000"
+                            value="{{ trade.selling_average if edit_mode else '' }}"
+                            placeholder="108000"
                             required
                         >
 
@@ -125,87 +553,631 @@
                 </div>
 
 
-                <!-- TP / SL / RISK -->
+                <!-- TP SL RISK -->
 
-                <div class="form-row three">
+                <div class="row row3">
 
-                    <div class="form-group">
+                    <div class="group">
 
-                        <label>Take Profit (%)</label>
+                        <label>TP %</label>
 
                         <input
                             type="number"
                             step="any"
                             name="tp"
-                            placeholder="e.g. 8"
+                            id="tp"
+                            value="{{ trade.tp if edit_mode else '' }}"
+                            placeholder="8"
                             required
                         >
 
                     </div>
 
+                    <div class="group">
 
-                    <div class="form-group">
-
-                        <label>Stop Loss (%)</label>
+                        <label>SL %</label>
 
                         <input
                             type="number"
                             step="any"
                             name="sl"
-                            placeholder="e.g. 2"
+                            id="sl"
+                            value="{{ trade.sl if edit_mode else '' }}"
+                            placeholder="2"
                             required
                         >
 
                     </div>
 
+                    <div class="group">
 
-                    <div class="form-group">
-
-                        <label>Risk of Capital (%)</label>
+                        <label>Risk %</label>
 
                         <input
                             type="number"
                             step="any"
                             name="risk"
-                            placeholder="e.g. 1"
+                            id="risk"
+                            value="{{ trade.risk if edit_mode else '' }}"
+                            placeholder="1"
                             required
                         >
 
                     </div>
+
+                </div>
+
+
+                <!-- CALCULATOR -->
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <span>Risk</span>
+                        <strong id="riskAmount">0 USDT</strong>
+                    </div>
+
+                    <div class="stat">
+                        <span>Position</span>
+                        <strong id="positionSize">0 USDT</strong>
+                    </div>
+
+                    <div class="stat">
+                        <span>R:R</span>
+                        <strong id="rr">0 : 1</strong>
+                    </div>
+
+                </div>
+
+
+                <!-- RESULT -->
+
+                <div class="group">
+
+                    <label>Result</label>
+
+                    <div class="choices three">
+
+                        <div class="choice win">
+
+                            <input
+                                type="radio"
+                                id="win"
+                                name="result"
+                                value="WIN"
+                            >
+
+                            <label for="win">✓ WIN</label>
+
+                        </div>
+
+                        <div class="choice loss">
+
+                            <input
+                                type="radio"
+                                id="loss"
+                                name="result"
+                                value="LOSS"
+                                checked
+                            >
+
+                            <label for="loss">✕ LOSS</label>
+
+                        </div>
+
+                        <div class="choice be">
+
+                            <input
+                                type="radio"
+                                id="be"
+                                name="result"
+                                value="BREAKEVEN"
+                            >
+
+                            <label for="be">= BE</label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- STRATEGY -->
+
+                <div class="group">
+
+                    <label>Strategy</label>
+
+                    <input
+                        type="text"
+                        name="strategy"
+                        value="{{ trade.strategy if edit_mode else '' }}"
+                        placeholder="BOS + FVG + CISD"
+                    >
 
                 </div>
 
 
                 <!-- REASON -->
 
-                <div class="form-group">
+                <div class="group">
 
                     <label>Reason Behind Trade</label>
 
                     <textarea
                         name="reason"
-                        rows="6"
-                        placeholder="Explain why you entered this trade..."
+                        placeholder="Why did you take this trade?"
                         required
-                    ></textarea>
+                    >{{ trade.reason if edit_mode else '' }}</textarea>
 
                 </div>
 
 
-                <button
-                    type="submit"
-                    class="save-trade-btn"
-                >
-                    Save Trade
-                </button>
+                <!-- NOTES -->
 
+                <div class="group">
+
+                    <label>Notes</label>
+
+                    <textarea
+                        name="notes"
+                        placeholder="Execution, emotions, mistakes, lessons..."
+                    >{{ trade.notes if edit_mode else '' }}</textarea>
+
+                </div>
+
+
+                <!-- SCREENSHOT -->
+
+                <div class="group">
+
+                    <label>Chart Screenshot</label>
+
+                    <input
+                        type="file"
+                        name="screenshot"
+                        accept="image/*"
+                    >
+
+                </div>
+
+
+                <button class="save" type="submit">
+
+                    {% if edit_mode %}
+                        ✓ Update Trade
+                    {% else %}
+                        ✓ Save Trade
+                    {% endif %}
+
+                </button>
 
             </form>
 
         </div>
 
+
+        <!-- ================= TRADINGVIEW ================= -->
+
+        <div class="card">
+
+            <div class="chart-header">
+
+                <div class="chart-title">
+
+                    TradingView
+
+                    <small>
+                        Analyze your setup before recording it.
+                    </small>
+
+                </div>
+
+
+                <div class="chart-tools">
+
+                    <input
+                        id="chartSymbol"
+                        value="{{ trade.ticker if edit_mode else 'BTC/USDT' }}"
+                        placeholder="BTC/USDT"
+                    >
+
+                    <button
+                        type="button"
+                        onclick="loadChart()"
+                    >
+                        LOAD
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="chart">
+
+                <div
+                    class="tradingview-widget-container"
+                    style="height:100%;width:100%"
+                >
+
+                    <div
+                        class="tradingview-widget-container__widget"
+                        style="height:calc(100% - 32px);width:100%"
+                    ></div>
+
+                    <div class="tradingview-widget-copyright">
+
+                        <a
+                            href="https://www.tradingview.com/"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            TradingView
+                        </a>
+
+                    </div>
+
+                    <script
+                        type="text/javascript"
+                        src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js"
+                        async
+                    >
+                    {
+                        "autosize": true,
+                        "symbol": "BINANCE:BTCUSDT",
+                        "interval": "60",
+                        "timezone": "Etc/UTC",
+                        "theme": "dark",
+                        "style": "1",
+                        "locale": "en",
+                        "withdateranges": true,
+                        "hide_side_toolbar": false,
+                        "allow_symbol_change": true,
+                        "save_image": false,
+                        "calendar": false,
+                        "support_host": "https://www.tradingview.com"
+                    }
+                    </script>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
-</body>
+</div>
 
+
+<script>
+
+    /* =========================
+       DATE
+    ========================= */
+
+    const dateInput = document.getElementById("tradeDate");
+    const dayInput = document.getElementById("tradeDay");
+
+    if (!dateInput.value) {
+
+        const today = new Date();
+
+        dateInput.value =
+            today.toISOString().split("T")[0];
+
+        dayInput.value =
+            today.toLocaleDateString(
+                "en-US",
+                {weekday:"long"}
+            );
+    }
+
+
+    dateInput.addEventListener("change", function(){
+
+        const date =
+            new Date(this.value + "T00:00:00");
+
+        dayInput.value =
+            date.toLocaleDateString(
+                "en-US",
+                {weekday:"long"}
+            );
+
+    });
+
+
+    /* =========================
+       CALCULATOR
+    ========================= */
+
+    function calculate() {
+
+        const capital =
+            parseFloat(
+                document.getElementById("capital").value
+            ) || 0;
+
+        const risk =
+            parseFloat(
+                document.getElementById("risk").value
+            ) || 0;
+
+        const sl =
+            parseFloat(
+                document.getElementById("sl").value
+            ) || 0;
+
+        const tp =
+            parseFloat(
+                document.getElementById("tp").value
+            ) || 0;
+
+
+        const riskAmount =
+            capital * risk / 100;
+
+
+        const positionSize =
+            sl > 0
+                ? riskAmount / (sl / 100)
+                : 0;
+
+
+        const rr =
+            sl > 0
+                ? tp / sl
+                : 0;
+
+
+        document.getElementById("riskAmount")
+            .innerText =
+            riskAmount.toFixed(2) + " USDT";
+
+
+        document.getElementById("positionSize")
+            .innerText =
+            positionSize.toFixed(2) + " USDT";
+
+
+        document.getElementById("rr")
+            .innerText =
+            rr.toFixed(2) + " : 1";
+
+    }
+
+
+    document
+        .getElementById("risk")
+        .addEventListener("input",calculate);
+
+    document
+        .getElementById("sl")
+        .addEventListener("input",calculate);
+
+    document
+        .getElementById("tp")
+        .addEventListener("input",calculate);
+
+    calculate();
+
+
+    /* =========================
+       TRADINGVIEW
+    ========================= */
+
+    function normalizeSymbol(value) {
+
+        let symbol =
+            value
+                .trim()
+                .toUpperCase()
+                .replace(/\s/g,"");
+
+
+        if (!symbol) {
+            symbol = "BTC/USDT";
+        }
+
+
+        if (symbol.includes(":")) {
+            return symbol;
+        }
+
+
+        symbol =
+            symbol
+                .replace("/","")
+                .replace("-","");
+
+
+        if (
+            !symbol.endsWith("USDT") &&
+            !symbol.endsWith("USDC") &&
+            !symbol.endsWith("USD")
+        ) {
+            symbol += "USDT";
+        }
+
+
+        return "BINANCE:" + symbol;
+
+    }
+
+
+    function loadChart() {
+
+        const input =
+            document.getElementById("chartSymbol");
+
+        const ticker =
+            document.getElementById("ticker");
+
+
+        const symbol =
+            normalizeSymbol(input.value);
+
+
+        /*
+           Tell TradingView to change
+           the symbol through its URL.
+        */
+
+        const container =
+            document.querySelector(
+                ".tradingview-widget-container"
+            );
+
+
+        container.innerHTML = `
+
+            <div
+                class="tradingview-widget-container__widget"
+                style="height:calc(100% - 32px);width:100%"
+            ></div>
+
+            <div class="tradingview-widget-copyright">
+
+                <a
+                    href="https://www.tradingview.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    TradingView
+                </a>
+
+            </div>
+
+        `;
+
+
+        const script =
+            document.createElement("script");
+
+
+        script.src =
+            "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+
+
+        script.async = true;
+
+
+        script.type =
+            "text/javascript";
+
+
+        script.textContent = `
+
+        {
+            "autosize": true,
+            "symbol": "${symbol}",
+            "interval": "60",
+            "timezone": "Etc/UTC",
+            "theme": "dark",
+            "style": "1",
+            "locale": "en",
+            "withdateranges": true,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "save_image": false,
+            "calendar": false,
+            "support_host": "https://www.tradingview.com"
+        }
+
+        `;
+
+
+        container.appendChild(script);
+
+
+        /*
+           Keep form ticker synchronized
+        */
+
+        ticker.value =
+            input.value.toUpperCase();
+
+    }
+
+
+    /*
+       ENTER = load chart
+    */
+
+    document
+        .getElementById("chartSymbol")
+        .addEventListener(
+            "keydown",
+            function(event){
+
+                if(event.key === "Enter"){
+
+                    event.preventDefault();
+
+                    loadChart();
+
+                }
+
+            }
+        );
+
+</script>
+<!-- TRADINGVIEW TEST -->
+<div style="
+    width:100%;
+    height:650px;
+    margin-top:30px;
+    background:#111;
+    border:2px solid #8b5cf6;
+">
+
+    <div
+        class="tradingview-widget-container"
+        style="height:100%;width:100%"
+    >
+
+        <div
+            class="tradingview-widget-container__widget"
+            style="height:calc(100% - 32px);width:100%"
+        ></div>
+
+        <div class="tradingview-widget-copyright">
+            <a
+                href="https://www.tradingview.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                TradingView
+            </a>
+        </div>
+
+        <script
+            type="text/javascript"
+            src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js"
+            async
+        >
+        {
+            "autosize": true,
+            "symbol": "BINANCE:BTCUSDT",
+            "interval": "60",
+            "timezone": "Etc/UTC",
+            "theme": "dark",
+            "style": "1",
+            "locale": "en",
+            "withdateranges": true,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "save_image": false,
+            "calendar": false,
+            "support_host": "https://www.tradingview.com"
+        }
+        </script>
+
+    </div>
+
+</div>
+</body>
 </html>
