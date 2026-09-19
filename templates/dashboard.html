@@ -716,6 +716,80 @@
 
         .empty { text-align: center; padding: 50px; color: var(--text-faint); }
 
+        /* ============ BREAKING NEWS BANNER ============ */
+
+        .breaking-news-banner {
+            position: fixed;
+            top: -80px;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            background: var(--neg);
+            color: #fff;
+            padding: 12px 18px;
+            box-shadow: 0 8px 24px -8px rgba(0,0,0,0.35);
+            transition: top 0.4s cubic-bezier(.2,.9,.3,1.3);
+        }
+
+        .breaking-news-banner.show { top: 0; }
+
+        .bn-inner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .bn-tag {
+            flex-shrink: 0;
+            background: rgba(255,255,255,0.22);
+            font-family: var(--font-ui);
+            font-weight: 800;
+            font-size: 11px;
+            letter-spacing: 0.04em;
+            padding: 4px 9px;
+            border-radius: 6px;
+            animation: bnPulse 1.4s ease-in-out infinite;
+        }
+
+        @keyframes bnPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.55; }
+        }
+
+        .bn-text {
+            font-family: var(--font-ui);
+            font-weight: 600;
+            font-size: 13.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .bn-close {
+            flex-shrink: 0;
+            appearance: none;
+            border: none;
+            background: rgba(255,255,255,0.16);
+            color: #fff;
+            width: 26px;
+            height: 26px;
+            border-radius: 7px;
+            font-size: 16px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .bn-close:hover { background: rgba(255,255,255,0.28); }
+
+        @media (max-width: 650px) {
+            .bn-text { max-width: 60vw; }
+        }
+
         /* ============ RESPONSIVE ============ */
 
         @media (max-width: 1000px) {
@@ -743,7 +817,7 @@
         }
 
         @media print {
-            .topbar, .ticker-strip, .tabs, .capital-form, .live-chart-header, .filters, .actions, th:last-child, td:last-child { display: none !important; }
+            .topbar, .ticker-strip, .tabs, .capital-form, .live-chart-header, .filters, .actions, th:last-child, td:last-child, .breaking-news-banner { display: none !important; }
             .tab-panel { display: block !important; }
             body { background: #fff; color: #000; }
         }
@@ -751,6 +825,14 @@
 </head>
 
 <body>
+
+<div class="breaking-news-banner" id="breakingNewsBanner">
+    <div class="bn-inner">
+        <span class="bn-tag">BREAKING</span>
+        <span class="bn-text" id="bnText">—</span>
+    </div>
+    <button type="button" class="bn-close" onclick="dismissBreakingNews()" title="Dismiss">&times;</button>
+</div>
 
 <div class="topbar">
     <div class="topbar-inner">
@@ -818,8 +900,10 @@
     <div class="tabs">
         <button type="button" class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">Overview</button>
         <button type="button" class="tab-btn" data-tab="live" onclick="switchTab('live')">Live Chart</button>
+        <button type="button" class="tab-btn" data-tab="news" onclick="switchTab('news')">News</button>
         <button type="button" class="tab-btn" data-tab="analytics" onclick="switchTab('analytics')">Analytics</button>
         <button type="button" class="tab-btn" data-tab="tools" onclick="switchTab('tools')">Tools</button>
+        <button type="button" class="tab-btn" data-tab="alarms" onclick="switchTab('alarms')">Alarms</button>
         <button type="button" class="tab-btn" data-tab="history" onclick="switchTab('history')">Trade History</button>
     </div>
 
@@ -929,6 +1013,56 @@
                 </div>
             </div>
 
+        </div>
+
+    </div>
+
+
+    <!-- ============ NEWS TAB ============ -->
+
+    <div class="tab-panel" id="tab-news">
+
+        <div class="panel">
+            <div class="panel-head">
+                <h2><span class="dot"></span>Economic Calendar</h2>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener" class="btn">Open Forex Factory ↗</a>
+                </div>
+            </div>
+            <p class="panel-note">
+                Forex Factory doesn't publish a public API and blocks its calendar from being embedded elsewhere, so this panel runs on TradingView's official economic calendar widget instead — same underlying event data, real embed. "Open Forex Factory" launches their actual site in a new tab for the exact source.
+            </p>
+
+            <div class="chip-row" id="calImpactChips">
+                <button type="button" class="chip active" data-impact="-1,0,1">All Impact</button>
+                <button type="button" class="chip" data-impact="1">High Only</button>
+                <button type="button" class="chip" data-impact="0,1">Medium + High</button>
+            </div>
+
+            <div class="widget-frame-box" style="height:520px;">
+                <div class="tradingview-widget-container" id="newsCalendarContainer" style="height:100%;width:100%;"></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2><span class="dot"></span>Top Financial Headlines</h2>
+            <p class="panel-note">Live market news feed (TradingView).</p>
+            <div class="widget-frame-box" style="height:460px;">
+                <div class="tradingview-widget-container" id="newsTimelineContainer" style="height:100%;width:100%;"></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                <h2><span class="dot"></span>Breaking News Alerts</h2>
+                <span class="badge" id="bnStatusBadge" style="background:var(--accent-dim);color:var(--accent);">CHECKING…</span>
+            </div>
+            <p class="panel-note">
+                When a high-impact release just printed, a red banner slides down from the top of the page for a few seconds, same idea as a news-bot alert. It polls a free, unofficial JSON mirror of the weekly calendar
+                (<code>nfs.faireconomy.media</code>) every 5 minutes and only fires for events flagged "High" impact. This mirror isn't run or guaranteed by Forex Factory or Anthropic — if it's ever unreachable the badge below will say so and the rest of the journal keeps working normally.
+                For a rock-solid feed, swap this for a paid economic-calendar API (e.g. Trading Economics, Finnhub, FMP) behind your own backend.
+            </p>
+            <button type="button" class="btn" onclick="testBreakingNews()">Send test alert</button>
         </div>
 
     </div>
@@ -1066,26 +1200,26 @@
 
         <div class="panel">
             <h2><span class="dot"></span>Session Clock</h2>
-            <div class="utc-clock" id="utcClock">--:--:-- <span>UTC</span></div>
+            <div class="utc-clock" id="utcClock">--:--:-- <span>PKT</span></div>
             <div class="session-grid" id="sessionGrid">
-                <div class="session-card" data-open="7" data-close="16">
+                <div class="session-card" data-open="12" data-close="21">
                     <div class="session-name">Sydney</div>
-                    <div class="session-hours">07:00 – 16:00 UTC</div>
+                    <div class="session-hours">12:00 – 21:00 PKT</div>
                     <div class="session-state">CLOSED</div>
                 </div>
-                <div class="session-card" data-open="0" data-close="9">
+                <div class="session-card" data-open="5" data-close="14">
                     <div class="session-name">Tokyo</div>
-                    <div class="session-hours">00:00 – 09:00 UTC</div>
-                    <div class="session-state">CLOSED</div>
-                </div>
-                <div class="session-card" data-open="8" data-close="17">
-                    <div class="session-name">London</div>
-                    <div class="session-hours">08:00 – 17:00 UTC</div>
+                    <div class="session-hours">05:00 – 14:00 PKT</div>
                     <div class="session-state">CLOSED</div>
                 </div>
                 <div class="session-card" data-open="13" data-close="22">
+                    <div class="session-name">London</div>
+                    <div class="session-hours">13:00 – 22:00 PKT</div>
+                    <div class="session-state">CLOSED</div>
+                </div>
+                <div class="session-card" data-open="18" data-close="3">
                     <div class="session-name">New York</div>
-                    <div class="session-hours">13:00 – 22:00 UTC</div>
+                    <div class="session-hours">18:00 – 03:00 PKT</div>
                     <div class="session-state">CLOSED</div>
                 </div>
             </div>
@@ -1186,12 +1320,73 @@
             </div>
         </div>
 
-        <div class="panel" style="margin-top:18px;">
+    </div>
+
+
+    <!-- ============ ALARMS TAB ============ -->
+
+    <div class="tab-panel" id="tab-alarms">
+
+        <div class="panel">
             <div class="panel-head">
-                <h2><span class="dot"></span>Economic Calendar</h2>
+                <h2><span class="dot"></span>Price Alarms</h2>
+                <span class="badge" id="alarmStatusBadge" style="background:var(--accent-dim);color:var(--accent);">LIVE</span>
             </div>
-            <div class="widget-frame-box">
-                <div class="tradingview-widget-container" id="calendarContainer" style="height:100%;width:100%;"></div>
+            <p class="panel-note">
+                Set a target price for any coin. Checked every 30 seconds against live
+                CoinGecko prices — when it's hit, your phone gets a push alert via ntfy,
+                even locked, even if this page isn't open.
+            </p>
+
+            <div class="field-row">
+                <div class="field">
+                    <label>Coin</label>
+                    <select id="alarmCoin">
+                        <option value="BTC">BTC</option>
+                        <option value="ETH">ETH</option>
+                        <option value="SOL">SOL</option>
+                        <option value="BNB">BNB</option>
+                        <option value="XRP">XRP</option>
+                        <option value="ADA">ADA</option>
+                        <option value="DOGE">DOGE</option>
+                        <option value="DOT">DOT</option>
+                        <option value="AVAX">AVAX</option>
+                        <option value="LINK">LINK</option>
+                        <option value="MATIC">MATIC</option>
+                        <option value="LTC">LTC</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Direction</label>
+                    <select id="alarmDirection">
+                        <option value="above">Price goes above</option>
+                        <option value="below">Price goes below</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="field-row full">
+                <div class="field">
+                    <label>Target Price (USD)</label>
+                    <input type="number" step="any" id="alarmTarget" placeholder="e.g. 65000">
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="addAlarm()">Set Alarm</button>
+
+            <div class="chip-row" id="quickCoinChips" style="margin-top:16px;">
+                <button type="button" class="chip active" data-symbol="BTC">BTC</button>
+                <button type="button" class="chip" data-symbol="ETH">ETH</button>
+                <button type="button" class="chip" data-symbol="SOL">SOL</button>
+                <button type="button" class="chip" data-symbol="XRP">XRP</button>
+                <button type="button" class="chip" data-symbol="DOGE">DOGE</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2><span class="dot"></span>Active &amp; Recent Alarms</h2>
+            <div id="alarmList">
+                <div class="empty">Loading...</div>
             </div>
         </div>
 
@@ -1362,6 +1557,7 @@
 
     let tvLoaded = false;
     let toolsWidgetsLoaded = false;
+    let newsWidgetsLoaded = false;
 
     function switchTab(name) {
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1378,8 +1574,17 @@
 
         if (name === 'tools' && !toolsWidgetsLoaded) {
             loadHeatmap();
-            loadEconomicCalendar();
             toolsWidgetsLoaded = true;
+        }
+
+        if (name === 'news' && !newsWidgetsLoaded) {
+            loadEconomicCalendar('-1,0,1');
+            loadNewsTimeline();
+            newsWidgetsLoaded = true;
+        }
+
+        if (name === 'alarms') {
+            fetchAlarms();
         }
 
         // Charts sized while hidden report 0 dimensions - resize once visible
@@ -1484,15 +1689,154 @@
         loadTradingViewChart();
     }
 
+    /* ================= NEWS: ECONOMIC CALENDAR + HEADLINES ================= */
+
+    function loadEconomicCalendar(importanceFilter) {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const container = document.getElementById('newsCalendarContainer');
+        if (!container) return;
+        container.innerHTML = '';
+        const script = document.createElement('script');
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
+        script.async = true;
+        script.innerHTML = JSON.stringify({
+            colorTheme: isDark ? "dark" : "light",
+            isTransparent: true,
+            width: "100%",
+            height: "100%",
+            locale: "en",
+            importanceFilter: importanceFilter || "-1,0,1",
+            countryFilter: "us,eu,gb,jp,au,ca,cn,ch,nz"
+        });
+        container.appendChild(script);
+    }
+
+    document.querySelectorAll('#calImpactChips .chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('#calImpactChips .chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            loadEconomicCalendar(chip.dataset.impact);
+        });
+    });
+
+    function loadNewsTimeline() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const container = document.getElementById('newsTimelineContainer');
+        if (!container) return;
+        container.innerHTML = '';
+        const script = document.createElement('script');
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js';
+        script.async = true;
+        script.innerHTML = JSON.stringify({
+            feedMode: "all_symbols",
+            colorTheme: isDark ? "dark" : "light",
+            isTransparent: true,
+            displayMode: "regular",
+            width: "100%",
+            height: "100%",
+            locale: "en"
+        });
+        container.appendChild(script);
+    }
+
+    /* ================= BREAKING NEWS BANNER ================= */
+
+    let bnSeen = new Set();
+    try {
+        bnSeen = new Set(JSON.parse(localStorage.getItem('tj_seen_news') || '[]'));
+    } catch (e) { bnSeen = new Set(); }
+
+    let bnQueue = [];
+    let bnTimer = null;
+
+    function queueBreakingNews(text) {
+        bnQueue.push(text);
+        if (!bnTimer) showNextBreakingNews();
+    }
+
+    function showNextBreakingNews() {
+        if (bnQueue.length === 0) { bnTimer = null; return; }
+        const text = bnQueue.shift();
+        const banner = document.getElementById('breakingNewsBanner');
+        document.getElementById('bnText').textContent = text;
+        banner.classList.add('show');
+        bnTimer = setTimeout(() => {
+            banner.classList.remove('show');
+            setTimeout(showNextBreakingNews, 500);
+        }, 8000);
+    }
+
+    function dismissBreakingNews() {
+        clearTimeout(bnTimer);
+        bnTimer = null;
+        document.getElementById('breakingNewsBanner').classList.remove('show');
+        setTimeout(showNextBreakingNews, 400);
+    }
+
+    function testBreakingNews() {
+        queueBreakingNews('USD — Core CPI m/m released — Actual: 0.3% | Forecast: 0.2% | Previous: 0.2%');
+    }
+
+    async function checkBreakingNews() {
+        const badge = document.getElementById('bnStatusBadge');
+        try {
+            const res = await fetch('https://nfs.faireconomy.media/ff_calendar_thisweek.json');
+            if (!res.ok) throw new Error('bad response');
+            const events = await res.json();
+            const now = new Date();
+            let fired = 0;
+
+            events.forEach(ev => {
+                if (!ev || ev.impact !== 'High') return;
+                const evTime = new Date(ev.date);
+                if (isNaN(evTime.getTime())) return;
+                const diffMin = (now - evTime) / 60000;
+                const key = (ev.country || '') + '|' + (ev.title || '') + '|' + ev.date;
+                if (diffMin >= 0 && diffMin <= 15 && !bnSeen.has(key)) {
+                    bnSeen.add(key);
+                    fired++;
+                    let detail = ev.country ? ev.country + ' — ' + ev.title : ev.title;
+                    if (ev.actual) {
+                        detail += ' — Actual: ' + ev.actual;
+                        if (ev.forecast) detail += ' | Forecast: ' + ev.forecast;
+                        if (ev.previous) detail += ' | Prev: ' + ev.previous;
+                    } else {
+                        detail += ' — releasing now';
+                    }
+                    queueBreakingNews(detail);
+                }
+            });
+
+            try { localStorage.setItem('tj_seen_news', JSON.stringify([...bnSeen])); } catch (e) {}
+
+            if (badge) {
+                badge.textContent = fired > 0 ? (fired + ' NEW') : 'LIVE';
+                badge.style.background = 'var(--pos-bg)';
+                badge.style.color = 'var(--pos)';
+            }
+        } catch (e) {
+            console.warn('Breaking news feed unavailable:', e);
+            if (badge) {
+                badge.textContent = 'FEED UNAVAILABLE';
+                badge.style.background = 'var(--warn-bg)';
+                badge.style.color = 'var(--warn)';
+            }
+        }
+    }
+
+    checkBreakingNews();
+    setInterval(checkBreakingNews, 5 * 60 * 1000);
+
     /* ================= TOOLS: SESSION CLOCK ================= */
 
     function updateSessionClock() {
         const now = new Date();
-        const h = now.getUTCHours();
+        // Pakistan Standard Time is a fixed UTC+5:00 offset (no daylight saving).
+        const h = (now.getUTCHours() + 5) % 24;
         const m = now.getUTCMinutes();
         const s = now.getUTCSeconds();
         const pad = n => String(n).padStart(2, '0');
-        document.getElementById('utcClock').innerHTML = `${pad(h)}:${pad(m)}:${pad(s)} <span>UTC</span>`;
+        document.getElementById('utcClock').innerHTML = `${pad(h)}:${pad(m)}:${pad(s)} <span>PKT</span>`;
 
         document.querySelectorAll('.session-card').forEach(card => {
             const open = parseInt(card.dataset.open, 10);
@@ -1567,7 +1911,7 @@
         document.getElementById('rrResult').style.display = 'grid';
     }
 
-    /* ================= TOOLS: HEATMAP + ECONOMIC CALENDAR ================= */
+    /* ================= TOOLS: HEATMAP ================= */
 
     function loadHeatmap() {
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -1594,24 +1938,99 @@
         container.appendChild(script);
     }
 
-    function loadEconomicCalendar() {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        const container = document.getElementById('calendarContainer');
-        container.innerHTML = '';
-        const script = document.createElement('script');
-        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
-        script.async = true;
-        script.innerHTML = JSON.stringify({
-            colorTheme: isDark ? "dark" : "light",
-            isTransparent: true,
-            width: "100%",
-            height: "100%",
-            locale: "en",
-            importanceFilter: "-1,0,1",
-            countryFilter: "us,eu,gb,jp,au,ca,cn"
-        });
-        container.appendChild(script);
+    /* ================= ALARMS ================= */
+
+    async function fetchAlarms() {
+        const list = document.getElementById('alarmList');
+        try {
+            const res = await fetch('/api/alarms');
+            const alarms = await res.json();
+
+            if (!alarms.length) {
+                list.innerHTML = '<div class="empty">No alarms set yet.</div>';
+                return;
+            }
+
+            list.innerHTML = '';
+            alarms.slice().reverse().forEach(a => {
+                const row = document.createElement('div');
+                row.className = 'metric';
+                row.style.display = 'flex';
+                row.style.justifyContent = 'space-between';
+                row.style.alignItems = 'center';
+                row.style.marginBottom = '10px';
+
+                const arrow = a.direction === 'above' ? '▲' : '▼';
+                const dirClass = a.direction === 'above' ? 'long' : 'short';
+                const statusBadge = a.triggered
+                    ? '<span class="badge win">TRIGGERED</span>'
+                    : '<span class="badge breakeven">WATCHING</span>';
+
+                row.innerHTML = `
+                    <div>
+                        <span class="direction-tag ${dirClass}">${arrow} ${a.coin_symbol}</span>
+                        <span style="font-family:var(--font-mono);margin-left:8px;">
+                            $${a.target_price.toLocaleString()}
+                        </span>
+                        <div style="margin-top:4px;">${statusBadge}</div>
+                    </div>
+                    <a href="#" class="small-btn" data-id="${a.id}" onclick="return false;">Delete</a>
+                `;
+
+                row.querySelector('.small-btn').addEventListener('click', async () => {
+                    await fetch('/api/alarms/' + a.id, { method: 'DELETE' });
+                    fetchAlarms();
+                });
+
+                list.appendChild(row);
+            });
+        } catch (e) {
+            list.innerHTML = '<div class="empty">Could not load alarms.</div>';
+            console.warn('fetchAlarms failed:', e);
+        }
     }
+
+    async function addAlarm() {
+        const coin_symbol = document.getElementById('alarmCoin').value;
+        const direction = document.getElementById('alarmDirection').value;
+        const target_price = document.getElementById('alarmTarget').value;
+
+        if (!target_price) {
+            alert('Enter a target price.');
+            return;
+        }
+
+        const res = await fetch('/api/alarms', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ coin_symbol, direction, target_price })
+        });
+
+        if (res.ok) {
+            document.getElementById('alarmTarget').value = '';
+            fetchAlarms();
+        } else {
+            const err = await res.json();
+            alert(err.error || 'Something went wrong.');
+        }
+    }
+
+    document.querySelectorAll('#quickCoinChips .chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('#quickCoinChips .chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            document.getElementById('alarmCoin').value = chip.dataset.symbol;
+        });
+    });
+
+    // Refresh the alarm list periodically so "WATCHING" -> "TRIGGERED"
+    // updates even if you leave the tab open.
+    setInterval(() => {
+        const alarmsTab = document.getElementById('tab-alarms');
+        if (alarmsTab && alarmsTab.classList.contains('active')) {
+            fetchAlarms();
+        }
+    }, 15000);
 
     /* ================= TRADE HISTORY: SORTING ================= */
 
